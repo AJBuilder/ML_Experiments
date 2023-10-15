@@ -1,0 +1,6 @@
+5/25/23
+mutability = 0.01f
+Successfully simulating prey and predator with a single fully connected layer with linear activation.
+Prey tend to herd together. Predators wander around and sometimes hone in on prey.
+I think since the map is too small, this behavior is rewarded.
+Also, when at max population, it is random who births next. This doesn't reward the best.

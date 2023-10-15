@@ -20,6 +20,11 @@ public class Layer
         weights = new float[outputDim, inputDim + 1]; // +1 is the bias
     }
 
+    public Layer(int inputDim, int outputDim, System.Func<float, float> activationFunc)
+    {
+        weights = new float[outputDim, inputDim + 1]; // +1 is the bias
+    }
+
 
     public float[] compute(float[] input)
     {
@@ -56,9 +61,17 @@ public class Layer
 
     public void initRandomWeights(){
         for(int i = 0; i < weights.GetLength(0); i++){
-            for ( int j = 0; j < weights.GetLength(1) + 1; j++){
+            for ( int j = 0; j < weights.GetLength(1); j++){
                 weights[i,j] = Random.Range(-1f, 1f);
             }
+        }
+    }
+
+    internal void initRandomBiases()
+    {
+        for (int i = 0; i < weights.GetLength(0); i++)
+        {
+            weights[i, weights.GetLength(1) - 1] = Random.Range(-1f, 1f);
         }
     }
 
@@ -67,7 +80,7 @@ public class Layer
         float absDev = System.Math.Abs(maxDeviation);
         for (int i = 0; i < weights.GetLength(0); i++)
         {
-            for (int j = 0; j < weights.GetLength(1) + 1; j++)
+            for (int j = 0; j < weights.GetLength(1); j++)
             {
                 weights[i, j] += Random.Range(-absDev, absDev);
             }
@@ -81,7 +94,7 @@ public class Layer
         else {
             for (int i = 0; i < weights.GetLength(0); i++)
             {
-                for (int j = 0; j < weights.GetLength(1) + 1; j++)
+                for (int j = 0; j < weights.GetLength(1); j++)
                 {
                     weights[i, j] = _weights[i,j];
                 }
@@ -102,6 +115,13 @@ public class Layer
     public int getInputSize()
     {
         return weights.GetLength(1);
+    }
+
+    public Layer copy()
+    {
+        Layer l = new Layer(weights.GetLength(1) - 1, weights.GetLength(0), this.activation);
+        l.setWeights(weights);
+        return l;
     }
 
     static float Linear(float x)
@@ -125,4 +145,6 @@ public class Layer
 
 
     }
+
+    
 }
