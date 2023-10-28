@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Unity.Burst;
 using Unity.VisualScripting;
 using UnityEngine;
+using Unity.Jobs;
+using Unity.Collections;
 
 /* 
  * Inputs
@@ -44,7 +46,8 @@ public class Creature : MonoBehaviour
     protected NeuralNetwork net;
     protected float timer;
     protected RaycastHit2D[] vision;
-    public float[] inputVector, outputVector;
+    public NativeArray<float> last_inputVector, inputVector, outputVector;
+    //public float[] inputVector, outputVector;
     public bool initialized;
 
     protected float viewDistance;
@@ -222,6 +225,23 @@ public class Creature : MonoBehaviour
             Vector3 cast = dir * viewDistance;
             vision[i] = Physics2D.Raycast(start, cast, cast.magnitude);
             Debug.DrawRay(start, cast, Color.red, updatePeriod);
+        }
+    }
+
+    public struct NetworkJob : IJob
+    {
+        public NeuralNetwork net;
+        [ReadOnly]
+        public NativeArray<float> input;
+        public NativeArray<float> output;
+
+        public void Execute()
+        {
+            float[] temp_out = net.computeNetwork(input.ToArray());
+            for (int i = 0; i < temp_out.Length; i++ )
+            {
+                output[i] = temp_out[i];
+            }
         }
     }
 }

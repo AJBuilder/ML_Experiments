@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class World : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class World : MonoBehaviour
     public int worldSize;
 
     public GameObject left,right,top,bottom;
+    public Text info;
 
     public int preyAlive, predAlive;
     public int spawns;
@@ -89,6 +91,16 @@ public class World : MonoBehaviour
         else
         {
             timer = 0;
+
+            info.text = "FPS: " + Time.captureFramerate + '\n' +
+                "Prey: " + preyAlive + '\n' +
+                "Pred: " + predAlive + '\n';
+            Debug.Log("preyAlive " + preyAlive);
+
+            if (Input.GetKey(KeyCode.Escape))
+            {
+                Application.Quit();
+            }
 
 
             if (preyAlive <= 0 || predAlive <= 0)

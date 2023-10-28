@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -56,7 +58,9 @@ public class Predator : Creature
         }
 
         timer = 0;
-        inputVector = new float[numOfViewRays * 4 + 2];
+        inputVector = new NativeArray<float>(numOfViewRays * 4 + 2, Allocator.Persistent);
+        last_inputVector = new NativeArray<float>(numOfViewRays * 4 + 2, Allocator.Persistent);
+        outputVector = new NativeArray<float>(2, Allocator.Persistent);
         vision = new RaycastHit2D[numOfViewRays];
     }
     // Update is called once per frame
@@ -71,6 +75,14 @@ public class Predator : Creature
             }
             else
             {
+                //NetworkJob compute = new NetworkJob()
+                //{
+                //    input = last_inputVector,
+                //    output = outputVector,
+                //    net = net
+                //};
+                //JobHandle computeJob = compute.Schedule();
+
                 if (this.health <= 0)
                 {
                     die();
@@ -90,8 +102,15 @@ public class Predator : Creature
                     //inputVector[inputVector.Length - 1] = this.tillBirth;
 
 
-                    outputVector = net.computeNetwork(inputVector);
+                    //outputVector = net.computeNetwork(inputVector);
 
+
+                    //computeJob.Complete();
+                    float[] t = net.computeNetwork(inputVector.ToArray());
+                    for (int i = 0; i < t.Length; i++)
+                    {
+                        outputVector[i] = t[i];
+                    }
 
                     body.angularVelocity = outputVector[0];
                     body.velocity = transform.up * outputVector[1];
